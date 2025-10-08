@@ -1,3 +1,353 @@
+const COUNTRIES = [
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Brazil",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cape Verde",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czech Republic",
+  "Democratic Republic of the Congo",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Fiji",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "North Macedonia",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Vatican City",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
+];
+
+const CITIES = [
+  "Abu Dhabi",
+  "Accra",
+  "Addis Ababa",
+  "Amsterdam",
+  "Ankara",
+  "Antalya",
+  "Athens",
+  "Auckland",
+  "Baghdad",
+  "Bali",
+  "Bangkok",
+  "Barcelona",
+  "Beijing",
+  "Beirut",
+  "Belgrade",
+  "Berlin",
+  "Bern",
+  "Bogotá",
+  "Boston",
+  "Bratislava",
+  "Brisbane",
+  "Brussels",
+  "Bucharest",
+  "Budapest",
+  "Buenos Aires",
+  "Cairo",
+  "Calgary",
+  "Cape Town",
+  "Casablanca",
+  "Chengdu",
+  "Chicago",
+  "Chiang Mai",
+  "Copenhagen",
+  "Da Nang",
+  "Dallas",
+  "Delhi",
+  "Dhaka",
+  "Doha",
+  "Dubai",
+  "Dublin",
+  "Edinburgh",
+  "Florence",
+  "Frankfurt",
+  "Fukuoka",
+  "Geneva",
+  "Glasgow",
+  "Guangzhou",
+  "Hamburg",
+  "Hanoi",
+  "Havana",
+  "Helsinki",
+  "Ho Chi Minh City",
+  "Hong Kong",
+  "Honolulu",
+  "Houston",
+  "Istanbul",
+  "Jakarta",
+  "Jerusalem",
+  "Johannesburg",
+  "Kathmandu",
+  "Kigali",
+  "Kingston",
+  "Kolkata",
+  "Kuala Lumpur",
+  "Kuwait City",
+  "Kyoto",
+  "La Paz",
+  "Lagos",
+  "Lahore",
+  "Las Vegas",
+  "Lima",
+  "Lisbon",
+  "Ljubljana",
+  "London",
+  "Los Angeles",
+  "Luxor",
+  "Lyon",
+  "Macau",
+  "Madrid",
+  "Manama",
+  "Manila",
+  "Maputo",
+  "Marrakesh",
+  "Marseille",
+  "Melbourne",
+  "Mexico City",
+  "Miami",
+  "Milan",
+  "Montréal",
+  "Moscow",
+  "Mumbai",
+  "Munich",
+  "Nairobi",
+  "Naples",
+  "New Delhi",
+  "New York",
+  "Nice",
+  "Osaka",
+  "Oslo",
+  "Ottawa",
+  "Palma de Mallorca",
+  "Paris",
+  "Perth",
+  "Phnom Penh",
+  "Phuket",
+  "Prague",
+  "Quebec City",
+  "Quito",
+  "Reykjavík",
+  "Riga",
+  "Rio de Janeiro",
+  "Riyadh",
+  "Rome",
+  "San Diego",
+  "San Francisco",
+  "San José",
+  "San Juan",
+  "Santiago",
+  "São Paulo",
+  "Sapporo",
+  "Seattle",
+  "Seoul",
+  "Seville",
+  "Shanghai",
+  "Shenzhen",
+  "Siem Reap",
+  "Singapore",
+  "Stockholm",
+  "Sydney",
+  "Taipei",
+  "Tallinn",
+  "Tbilisi",
+  "Tehran",
+  "Tel Aviv",
+  "Thessaloniki",
+  "Tokyo",
+  "Toronto",
+  "Valencia",
+  "Vancouver",
+  "Venice",
+  "Vienna",
+  "Vilnius",
+  "Warsaw",
+  "Washington, D.C.",
+  "Wellington",
+  "Xi'an",
+  "Yerevan",
+  "Zagreb",
+  "Zürich",
+];
+
+const MAX_DESTINATIONS = 5;
+const listInputValues = new Map();
+
 function getNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && value !== "" ? parsed : null;
@@ -61,6 +411,167 @@ let emptyStateTitle = null;
 let emptyStateBody = null;
 let emptyStateIcon = null;
 let emptyStateDefaults = null;
+let destinationListEl = null;
+let addDestinationBtn = null;
+let destinationTemplate = null;
+
+function populateDatalist(id, values) {
+  const datalist = document.getElementById(id);
+  if (!datalist) return;
+  datalist.innerHTML = "";
+  values.forEach((value) => {
+    const option = document.createElement("option");
+    option.value = value;
+    datalist.append(option);
+  });
+}
+
+function getChipSelections(groupName, scope = document) {
+  const group = scope.querySelector(`[data-chip-group="${groupName}"]`);
+  if (!group) return [];
+  return Array.from(group.querySelectorAll('input[type="checkbox"]:checked')).map(
+    (input) => input.value
+  );
+}
+
+function initListInput(element) {
+  if (!element) return;
+  const field = element.dataset.field;
+  if (!field) return;
+  const chipsContainer = element.querySelector(".list-input__chips");
+  const textInput = element.querySelector('input[type="text"]');
+  const addButton = element.querySelector(".list-input__add");
+  if (!chipsContainer || !textInput || !addButton) return;
+
+  const values = listInputValues.get(field) || [];
+  listInputValues.set(field, values);
+
+  function render() {
+    chipsContainer.innerHTML = "";
+    if (!values.length) {
+      const placeholder = document.createElement("span");
+      placeholder.className = "list-input__placeholder";
+      placeholder.textContent = "No considerations added yet.";
+      chipsContainer.append(placeholder);
+    } else {
+      values.forEach((value) => {
+        const chip = document.createElement("span");
+        chip.className = "list-input__chip";
+        chip.setAttribute("role", "listitem");
+        const text = document.createElement("span");
+        text.textContent = value;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "list-input__chip-remove";
+        remove.setAttribute("aria-label", `Remove ${value}`);
+        remove.textContent = "×";
+        remove.addEventListener("click", () => {
+          const index = values.indexOf(value);
+          if (index >= 0) {
+            values.splice(index, 1);
+            render();
+          }
+        });
+        chip.append(text, remove);
+        chipsContainer.append(chip);
+      });
+    }
+    addButton.disabled = textInput.value.trim().length === 0;
+  }
+
+  function addValue() {
+    const value = textInput.value.trim();
+    if (!value) return;
+    if (!values.includes(value)) {
+      values.push(value);
+    }
+    textInput.value = "";
+    render();
+    textInput.focus();
+  }
+
+  addButton.addEventListener("click", addValue);
+  textInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addValue();
+    }
+  });
+  textInput.addEventListener("input", () => {
+    addButton.disabled = textInput.value.trim().length === 0;
+  });
+
+  render();
+}
+
+function updateDestinationLabels(listElement) {
+  if (!listElement) return;
+  Array.from(listElement.querySelectorAll(".destination-entry")).forEach(
+    (entry, index) => {
+      entry.dataset.destinationIndex = String(index + 1);
+      const label = entry.querySelector(".destination-entry__label");
+      if (label) {
+        label.textContent = `Destination ${index + 1}`;
+      }
+    }
+  );
+}
+
+function updateAddDestinationState(listElement, button) {
+  if (!listElement || !button) return;
+  const count = listElement.querySelectorAll(".destination-entry").length;
+  const atLimit = count >= MAX_DESTINATIONS;
+  button.disabled = atLimit;
+  button.textContent = atLimit
+    ? "Destination limit reached"
+    : "+ Add another destination";
+}
+
+function attachDestinationEvents(entry, listElement, button) {
+  const removeBtn = entry.querySelector(".destination-entry__remove");
+  if (removeBtn) {
+    removeBtn.addEventListener("click", () => {
+      entry.remove();
+      updateDestinationLabels(listElement);
+      updateAddDestinationState(listElement, button);
+    });
+  }
+}
+
+function addDestination(listElement, template, button) {
+  if (!listElement || !template || !button) return;
+  const count = listElement.querySelectorAll(".destination-entry").length;
+  if (count >= MAX_DESTINATIONS) return;
+  const node = template.content.firstElementChild.cloneNode(true);
+  listElement.append(node);
+  updateDestinationLabels(listElement);
+  attachDestinationEvents(node, listElement, button);
+  const countryInput = node.querySelector('[data-role="destination-country"]');
+  if (countryInput) {
+    countryInput.focus();
+  }
+  updateAddDestinationState(listElement, button);
+}
+
+function collectDestinations(listElement) {
+  if (!listElement) {
+    return { destinations: [], hasEmptyCountry: true };
+  }
+  const entries = Array.from(listElement.querySelectorAll(".destination-entry"));
+  const destinations = [];
+  let hasEmptyCountry = false;
+  entries.forEach((entry) => {
+    const countryInput = entry.querySelector('[data-role="destination-country"]');
+    const cityInput = entry.querySelector('[data-role="destination-city"]');
+    const country = countryInput?.value.trim() || "";
+    const city = cityInput?.value.trim() || "";
+    if (!country) {
+      hasEmptyCountry = true;
+    }
+    destinations.push({ country, city: city || null });
+  });
+  return { destinations, hasEmptyCountry };
+}
 
 function toggleEmptyState(show) {
   if (!emptyState) return;
@@ -232,6 +743,21 @@ function buildPayload(form) {
     .map((lang) => lang.trim())
     .filter(Boolean);
 
+  const { destinations, hasEmptyCountry } = collectDestinations(destinationListEl);
+  if (!destinations.length) {
+    throw new Error("Please add at least one destination.");
+  }
+  if (hasEmptyCountry) {
+    throw new Error("Please choose a country for each destination.");
+  }
+
+  const primaryDestination = destinations[0];
+  const accommodationSelections = getChipSelections("accommodation_type", form);
+  const topInterests = getChipSelections("top_interests", form);
+  const cuisineSelections = getChipSelections("cuisine_preferences", form);
+  const healthValues = (listInputValues.get("health_mobility") || []).filter(Boolean);
+
+  const payload = {
   const topInterestsSelect = form.elements.namedItem("top_interests");
   const topInterests = getSelectedValues(topInterestsSelect);
 
@@ -244,6 +770,11 @@ function buildPayload(form) {
       age_group: data.get("age_group"),
     },
     destination: {
+      country: primaryDestination.country,
+      city: primaryDestination.city,
+      period_from: data.get("period_from"),
+      period_to: data.get("period_to"),
+      flexible_dates: Boolean(form.elements.namedItem("flexible_dates")?.checked),
       country: data.get("destination_country"),
       city: data.get("destination_city") || null,
       period_from: data.get("period_from"),
@@ -256,6 +787,7 @@ function buildPayload(form) {
       adults: getNumber(data.get("adults")) ?? 0,
       children: getNumber(data.get("children")) ?? 0,
       seniors: getNumber(data.get("seniors")) ?? 0,
+      pet_accommodation: Boolean(form.elements.namedItem("pet_accommodation")?.checked),
       pet_accommodation: form.elements.namedItem("pet_accommodation").checked,
     },
     style: {
@@ -263,6 +795,9 @@ function buildPayload(form) {
       pace: data.get("pace"),
     },
     optional: {
+      accommodation_type: accommodationSelections[0] || null,
+      top_interests: topInterests.length ? topInterests : null,
+      cuisine_preferences: cuisineSelections[0] || null,
       accommodation_type: data.get("accommodation_type") || null,
       top_interests: topInterests.length ? topInterests : null,
       cuisine_preferences: data.get("cuisine_preferences") || null,
@@ -270,6 +805,27 @@ function buildPayload(form) {
     constraints: {
       budget_range_per_day: getNumber(data.get("budget_per_day")),
       budget_range_per_trip: getNumber(data.get("budget_per_trip")),
+      health_mobility: healthValues.length ? healthValues.join(", ") : null,
+      work_travel: Boolean(form.elements.namedItem("work_travel")?.checked),
+      other: data.get("other") || null,
+    },
+  };
+
+  payload.destinations = destinations;
+  if (destinations.length > 1) {
+    payload.additional_destinations = destinations.slice(1);
+  }
+  if (accommodationSelections.length) {
+    payload.optional.accommodation_type_choices = accommodationSelections;
+  }
+  if (cuisineSelections.length) {
+    payload.optional.cuisine_preferences_choices = cuisineSelections;
+  }
+  if (healthValues.length) {
+    payload.constraints.health_mobility_list = healthValues;
+  }
+
+  return payload;
       health_mobility: data.get("health_mobility") || null,
       work_travel: form.elements.namedItem("work_travel").checked,
       other: data.get("other") || null,
@@ -296,6 +852,28 @@ function attachFormHandler() {
   }
   const submitBtn = form.querySelector(".submit-btn");
 
+  populateDatalist("country-options", COUNTRIES);
+  populateDatalist("city-options", CITIES);
+
+  destinationListEl = document.getElementById("destination-list");
+  addDestinationBtn = document.getElementById("add-destination");
+  destinationTemplate = document.getElementById("destination-template");
+
+  if (destinationListEl) {
+    updateDestinationLabels(destinationListEl);
+    Array.from(destinationListEl.querySelectorAll(".destination-entry")).forEach((entry) => {
+      attachDestinationEvents(entry, destinationListEl, addDestinationBtn);
+    });
+  }
+  if (addDestinationBtn && destinationTemplate) {
+    addDestinationBtn.addEventListener("click", () =>
+      addDestination(destinationListEl, destinationTemplate, addDestinationBtn)
+    );
+    updateAddDestinationState(destinationListEl, addDestinationBtn);
+  }
+
+  form.querySelectorAll(".list-input").forEach((element) => initListInput(element));
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     statusEl.textContent = "Planning your trip...";
@@ -311,6 +889,18 @@ function attachFormHandler() {
       resultsContainer.innerHTML = "";
     }
 
+    let payload;
+    try {
+      payload = buildPayload(form);
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = error.message || "Please review the form and try again.";
+      statusEl.className = "status error";
+      resetEmptyStateMessage();
+      toggleEmptyState(false);
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
     const payload = buildPayload(form);
     if (submitBtn) submitBtn.disabled = true;
 
