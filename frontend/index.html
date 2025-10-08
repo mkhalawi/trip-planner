@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agentic Trip Planner</title>
+    <title>Trip Planner</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
@@ -12,6 +13,7 @@
         <div class="brand">
           <span class="brand__mark">🌍</span>
           <span class="brand__name">Agentic Trip Planner</span>
+          <span class="brand__name">WanderMind</span>
         </div>
         <div class="hero__content">
           <h1>Plan your next adventure with AI-guided experts</h1>
@@ -50,6 +52,7 @@
 
         <form id="trip-form" class="form-grid">
           <fieldset class="form-section form-section--basic">
+          <fieldset class="form-section">
             <legend>Basic Information</legend>
             <div class="fields-grid">
               <label>
@@ -75,6 +78,11 @@
                   list="city-options"
                   required
                 />
+                <input type="text" name="home_country" placeholder="e.g. Jordan" required />
+              </label>
+              <label>
+                Home City
+                <input type="text" name="home_city" placeholder="e.g. Amman" required />
               </label>
               <label>
                 Preferred Languages
@@ -131,6 +139,16 @@
               + Add another destination
             </button>
             <div class="fields-grid fields-grid--timeline">
+            <legend>Destination</legend>
+            <div class="fields-grid">
+              <label>
+                Country
+                <input type="text" name="destination_country" placeholder="Where to?" required />
+              </label>
+              <label>
+                City (optional)
+                <input type="text" name="destination_city" placeholder="Specific city" />
+              </label>
               <label>
                 Start Date
                 <input type="date" name="period_from" required />
@@ -143,6 +161,8 @@
                 <input type="checkbox" name="flexible_dates" />
                 <span class="toggle__indicator" aria-hidden="true"></span>
                 <span class="toggle__label">Flexible dates</span>
+              <label class="checkbox">
+                <input type="checkbox" name="flexible_dates" /> Flexible dates
               </label>
               <label>
                 Preferred Transportation
@@ -189,6 +209,10 @@
                 <span class="toggle__label">Pet accommodation needed</span>
               </label>
           </div>
+              <label class="checkbox">
+                <input type="checkbox" name="pet_accommodation" /> Pet accommodation needed
+              </label>
+            </div>
           </fieldset>
 
           <fieldset class="form-section">
@@ -305,6 +329,43 @@
                   </label>
                 </div>
               </div>
+            <div class="fields-grid">
+              <label>
+                Accommodation Type
+                <select name="accommodation_type">
+                  <option value="">No preference</option>
+                  <option value="hotels">Hotels</option>
+                  <option value="resorts">Resorts</option>
+                  <option value="apartment_airbnb">Apartment/Airbnb</option>
+                  <option value="mix">Mix</option>
+                </select>
+              </label>
+              <label>
+                Top Interests
+                <select name="top_interests" multiple size="6">
+                  <option value="beaches_water">Beaches &amp; Water activities</option>
+                  <option value="history_sightseeing">History &amp; Sightseeing</option>
+                  <option value="food_culture">Food &amp; Culture</option>
+                  <option value="music_festivals">Music &amp; Festivals</option>
+                  <option value="relaxing_wellness">Relaxing &amp; Wellness</option>
+                  <option value="shopping">Shopping</option>
+                  <option value="nature_wildlife">Nature &amp; Wildlife</option>
+                  <option value="nightlife">Nightlife</option>
+                  <option value="adventure_hikes">Adventure &amp; Hikes</option>
+                </select>
+                <small>Hold Ctrl/Cmd to select multiple options.</small>
+              </label>
+              <label>
+                Cuisine Preference
+                <select name="cuisine_preferences">
+                  <option value="">No preference</option>
+                  <option value="local">Local cuisines</option>
+                  <option value="international">International</option>
+                  <option value="street_food">Street food</option>
+                  <option value="fine_dining">Fine dining</option>
+                  <option value="mix">Mix</option>
+                </select>
+              </label>
             </div>
           </fieldset>
 
@@ -335,6 +396,12 @@
                 <input type="checkbox" name="work_travel" />
                 <span class="toggle__indicator" aria-hidden="true"></span>
                 <span class="toggle__label">Work travel needs (Wi-Fi, workspace)</span>
+              <label>
+                Health &amp; mobility considerations
+                <input type="text" name="health_mobility" placeholder="e.g. no long hikes" />
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="work_travel" /> Work travel needs (Wi-Fi, workspace)
               </label>
               <label>
                 Other notes
