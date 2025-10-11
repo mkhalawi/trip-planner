@@ -60,6 +60,7 @@ async def plan_trip_handler(request):
             status_code=500,
         )
 
+    plan = await plan_trip(trip_request)
     return JSONResponse(plan.model_dump(mode="json"))
 
 
