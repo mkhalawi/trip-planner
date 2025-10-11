@@ -12,6 +12,11 @@ from starlette.staticfiles import StaticFiles
 from main import plan_trip
 from trip_agents.models import TripRequest
 
+try:
+    from openai import OpenAIError
+except ImportError:  # pragma: no cover - fallback if package layout changes
+    OpenAIError = Exception
+
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / "frontend"
 
@@ -30,6 +35,30 @@ async def plan_trip_handler(request):
         trip_request = TripRequest.model_validate(payload)
     except ValidationError as exc:
         return JSONResponse({"error": "Invalid trip request.", "details": exc.errors()}, status_code=422)
+
+    try:
+        plan = await plan_trip(trip_request)
+    except OpenAIError as exc:
+        return JSONResponse(
+            {
+                "error": "Unable to contact the AI planner.",
+                "details": (
+                    "The backend requires a valid OPENAI_API_KEY environment variable "
+                    "to generate itineraries. Please set it and restart the server."
+                    if "api_key" in str(exc).lower()
+                    else str(exc)
+                ),
+            },
+            status_code=500,
+        )
+    except Exception as exc:  # pragma: no cover - catch-all for unexpected failures
+        return JSONResponse(
+            {
+                "error": "Failed to generate the trip plan.",
+                "details": str(exc),
+            },
+            status_code=500,
+        )
 
     plan = await plan_trip(trip_request)
     return JSONResponse(plan.model_dump(mode="json"))

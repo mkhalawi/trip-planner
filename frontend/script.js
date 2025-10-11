@@ -923,6 +923,15 @@ function attachFormHandler() {
       });
 
       if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        const err = new Error(errorBody.error || "Unable to generate plan.");
+        if (errorBody && errorBody.details) {
+          err.details =
+            typeof errorBody.details === "string"
+              ? errorBody.details
+              : JSON.stringify(errorBody.details);
+        }
+        throw err;
         const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Unable to generate plan.");
       }
@@ -935,6 +944,14 @@ function attachFormHandler() {
       console.error(error);
       statusEl.textContent = error.message || "Unexpected error occurred.";
       statusEl.classList.add("error");
+      const details =
+        typeof error.details === "string" && error.details.trim().length
+          ? error.details.trim()
+          : null;
+      setEmptyStateMessage(
+        "We hit a snag",
+        details ||
+          "Please tweak a detail and try again. If the issue persists, refresh the page and submit once more.",
       setEmptyStateMessage(
         "We hit a snag",
         "Please tweak a detail and try again. If the issue persists, refresh the page and submit once more.",
