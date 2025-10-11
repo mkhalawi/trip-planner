@@ -360,6 +360,10 @@ function getNumber(value) {
   return Number.isFinite(parsed) && value !== "" ? parsed : null;
 }
 
+function getSelectedValues(select) {
+  return Array.from(select.selectedOptions).map((option) => option.value);
+}
+
 function createBadge(text) {
   const span = document.createElement("span");
   span.className = "badge";
@@ -761,6 +765,10 @@ function buildPayload(form) {
   const healthValues = (listInputValues.get("health_mobility") || []).filter(Boolean);
 
   const payload = {
+  const topInterestsSelect = form.elements.namedItem("top_interests");
+  const topInterests = getSelectedValues(topInterestsSelect);
+
+  return {
     basic: {
       name: data.get("name"),
       home_country: data.get("home_country"),
@@ -774,6 +782,11 @@ function buildPayload(form) {
       period_from: data.get("period_from"),
       period_to: data.get("period_to"),
       flexible_dates: Boolean(form.elements.namedItem("flexible_dates")?.checked),
+      country: data.get("destination_country"),
+      city: data.get("destination_city") || null,
+      period_from: data.get("period_from"),
+      period_to: data.get("period_to"),
+      flexible_dates: form.elements.namedItem("flexible_dates").checked,
       preferred_transport: data.get("preferred_transport") || null,
     },
     group: {
@@ -782,6 +795,7 @@ function buildPayload(form) {
       children: getNumber(data.get("children")) ?? 0,
       seniors: getNumber(data.get("seniors")) ?? 0,
       pet_accommodation: Boolean(form.elements.namedItem("pet_accommodation")?.checked),
+      pet_accommodation: form.elements.namedItem("pet_accommodation").checked,
     },
     style: {
       budget: data.get("budget"),
@@ -791,6 +805,9 @@ function buildPayload(form) {
       accommodation_type: accommodationSelections[0] || null,
       top_interests: topInterests.length ? topInterests : null,
       cuisine_preferences: cuisineSelections[0] || null,
+      accommodation_type: data.get("accommodation_type") || null,
+      top_interests: topInterests.length ? topInterests : null,
+      cuisine_preferences: data.get("cuisine_preferences") || null,
     },
     constraints: {
       budget_range_per_day: getNumber(data.get("budget_per_day")),
@@ -816,6 +833,11 @@ function buildPayload(form) {
   }
 
   return payload;
+      health_mobility: data.get("health_mobility") || null,
+      work_travel: form.elements.namedItem("work_travel").checked,
+      other: data.get("other") || null,
+    },
+  };
 }
 
 function attachFormHandler() {
@@ -888,6 +910,7 @@ function attachFormHandler() {
       if (submitBtn) submitBtn.disabled = false;
       return;
     }
+    const payload = buildPayload(form);
     if (submitBtn) submitBtn.disabled = true;
 
     try {
