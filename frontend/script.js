@@ -348,6 +348,13 @@ const CITIES = [
 const MAX_DESTINATIONS = 5;
 const listInputValues = new Map();
 
+function setCurrentYear() {
+  const yearEl = document.getElementById("year");
+  if (yearEl) {
+    yearEl.textContent = String(new Date().getFullYear());
+  }
+}
+
 function getNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && value !== "" ? parsed : null;
@@ -836,6 +843,8 @@ function buildPayload(form) {
 function attachFormHandler() {
   const form = document.getElementById("trip-form");
   if (!form) return;
+
+  setCurrentYear();
 
   const statusEl = document.getElementById("status");
   resultsContainer = document.getElementById("results");
