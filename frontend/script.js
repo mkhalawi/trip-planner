@@ -489,6 +489,8 @@ function formatGeneratedTimestamp(timestamp) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
+function getSelectedValues(select) {
+  return Array.from(select.selectedOptions).map((option) => option.value);
 }
 
 function createBadge(text) {
@@ -957,6 +959,10 @@ function buildPayload(form) {
   const healthValues = (listInputValues.get("health_mobility") || []).filter(Boolean);
 
   const payload = {
+  const topInterestsSelect = form.elements.namedItem("top_interests");
+  const topInterests = getSelectedValues(topInterestsSelect);
+
+  return {
     basic: {
       name: data.get("name"),
       home_country: data.get("home_country"),
@@ -970,6 +976,11 @@ function buildPayload(form) {
       period_from: data.get("period_from"),
       period_to: data.get("period_to"),
       flexible_dates: Boolean(form.elements.namedItem("flexible_dates")?.checked),
+      country: data.get("destination_country"),
+      city: data.get("destination_city") || null,
+      period_from: data.get("period_from"),
+      period_to: data.get("period_to"),
+      flexible_dates: form.elements.namedItem("flexible_dates").checked,
       preferred_transport: data.get("preferred_transport") || null,
     },
     group: {
@@ -978,6 +989,7 @@ function buildPayload(form) {
       children: getNumber(data.get("children")) ?? 0,
       seniors: getNumber(data.get("seniors")) ?? 0,
       pet_accommodation: Boolean(form.elements.namedItem("pet_accommodation")?.checked),
+      pet_accommodation: form.elements.namedItem("pet_accommodation").checked,
     },
     style: {
       budget: data.get("budget"),
@@ -987,6 +999,9 @@ function buildPayload(form) {
       accommodation_type: accommodationSelections[0] || null,
       top_interests: topInterests.length ? topInterests : null,
       cuisine_preferences: cuisineSelections[0] || null,
+      accommodation_type: data.get("accommodation_type") || null,
+      top_interests: topInterests.length ? topInterests : null,
+      cuisine_preferences: data.get("cuisine_preferences") || null,
     },
     constraints: {
       budget_range_per_day: getNumber(data.get("budget_per_day")),
@@ -1012,6 +1027,11 @@ function buildPayload(form) {
   }
 
   return payload;
+      health_mobility: data.get("health_mobility") || null,
+      work_travel: form.elements.namedItem("work_travel").checked,
+      other: data.get("other") || null,
+    },
+  };
 }
 
 function attachFormHandler() {
@@ -1112,6 +1132,24 @@ function attachFormHandler() {
     try {
       payload = buildPayload(form);
       saveFormState(form);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    statusEl.textContent = "Planning your trip...";
+    statusEl.className = "status";
+    statusEl.classList.add("loading");
+    setEmptyStateMessage(
+      "Crafting your itinerary",
+      "Our travel brains are comparing flights, stays, and experiences tailored to you.",
+      "🧳"
+    );
+    toggleEmptyState(true);
+    if (resultsContainer) {
+      resultsContainer.innerHTML = "";
+    }
+
+    let payload;
+    try {
+      payload = buildPayload(form);
     } catch (error) {
       console.error(error);
       statusEl.textContent = error.message || "Please review the form and try again.";
@@ -1126,6 +1164,12 @@ function attachFormHandler() {
       if (submitBtn) submitBtn.disabled = false;
       return;
     }
+      resetEmptyStateMessage();
+      toggleEmptyState(false);
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
+    const payload = buildPayload(form);
     if (submitBtn) submitBtn.disabled = true;
 
     try {
@@ -1158,6 +1202,18 @@ function attachFormHandler() {
       console.error(error);
       statusEl.textContent = error.message || "Unexpected error occurred.";
       statusEl.className = "status error";
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Unable to generate plan.");
+      }
+
+      const plan = await response.json();
+      statusEl.textContent = "Trip plan generated!";
+      statusEl.classList.add("success");
+      renderPlan(plan);
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = error.message || "Unexpected error occurred.";
+      statusEl.classList.add("error");
       const details =
         typeof error.details === "string" && error.details.trim().length
           ? error.details.trim()
@@ -1178,6 +1234,17 @@ function attachFormHandler() {
       if (resultsContainer) {
         resultsContainer.classList.remove("results--busy");
       }
+      setEmptyStateMessage(
+        "We hit a snag",
+        details ||
+          "Please tweak a detail and try again. If the issue persists, refresh the page and submit once more.",
+      setEmptyStateMessage(
+        "We hit a snag",
+        "Please tweak a detail and try again. If the issue persists, refresh the page and submit once more.",
+        "⚠️"
+      );
+      toggleEmptyState(true);
+    } finally {
       if (submitBtn) submitBtn.disabled = false;
     }
   });
