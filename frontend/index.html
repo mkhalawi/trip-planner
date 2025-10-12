@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agentic Trip Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <a class="brand" href="#planner">
+          <span class="brand__icon">🧭</span>
+          <div>
+            <span class="brand__name">Agentic Trip Planner</span>
+            <span class="brand__tagline">AI travel concierge</span>
+          </div>
+        </a>
+        <nav class="topbar__nav" aria-label="Primary">
+          <a href="#planner">Plan</a>
+          <a href="#results-panel">Itinerary</a>
+          <a href="#why-us">Why us</a>
+        </nav>
+        <button class="ghost-button">Contact sales</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container hero__content">
+        <div class="hero__copy">
+          <p class="eyebrow">AI TRAVEL CONCIERGE</p>
+          <h1>Design your next escape with booking-grade polish</h1>
+          <p>
+            Enter your traveler preferences once and let specialist agents craft
+            a polished plan with flights, weather-ready activities, and curated
+            stays that feel like they came from your favorite booking sites.
+          </p>
+          <ul class="hero__highlights">
+            <li>
+              <span class="hero__icon">✈️</span>
+              Global flight options with smart layover picks
+            </li>
+            <li>
+              <span class="hero__icon">🏨</span>
+              Handpicked stays styled like top booking platforms
+            </li>
+            <li>
+              <span class="hero__icon">🗺️</span>
+              Day-by-day guidance that adapts to pace and interests
+            </li>
+          </ul>
+        </div>
+        <div class="hero__card">
+          <div class="hero__card-header">
+            <span class="badge badge--light">New</span>
+            <p>Agentic Trip Planner</p>
+            <h2>Trip snapshot</h2>
+            <p class="hero__card-subtitle">
+              Complete the planner below to unlock a shareable itinerary in
+              seconds.
+            </p>
+          </div>
+          <dl class="hero__stats">
+            <div>
+              <dt>Coverage</dt>
+              <dd>180+ countries</dd>
+            </div>
+            <div>
+              <dt>Avg. turnaround</dt>
+              <dd>&lt; 15 seconds</dd>
+            </div>
+            <div>
+              <dt>Plan detail</dt>
+              <dd>Flights • Hotels • Activities • Budget</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <main class="planner" id="planner">
+      <div class="container planner__grid">
+        <section class="planner__form card">
+          <header class="card__header">
+            <h2>Traveler details</h2>
+            <p>
+              Provide as much context as you like—our agents handle the heavy
+              lifting.
+            </p>
+          </header>
+
+          <form id="trip-form" class="form-grid">
+            <fieldset class="form-section form-section--basic">
+              <legend>Basic information</legend>
+              <div class="fields-grid fields-grid--compact">
+                <label>
+                  Full name
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Who is traveling?"
+                    required
+                  />
+                </label>
+                <label>
+                  Home country
+                  <input
+                    type="text"
+                    name="home_country"
+                    placeholder="Search country"
+                    list="country-options"
+                    required
+                  />
+                </label>
+                <label>
+                  Home city
+                  <input
+                    type="text"
+                    name="home_city"
+                    placeholder="Search city"
+                    list="city-options"
+                    required
+                  />
+                </label>
+                <label>
+                  Preferred languages
+                  <input
+                    type="text"
+                    name="preferred_languages"
+                    placeholder="en, ar"
+                  />
+                </label>
+                <label>
+                  Age group
+                  <select name="age_group" required>
+                    <option value="">Select...</option>
+                    <option value="child">Child</option>
+                    <option value="teen">Teen</option>
+                    <option value="adult">Adult</option>
+                    <option value="senior">Senior</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend>Destinations &amp; timing</legend>
+              <div class="destinations" id="destination-list">
+                <div class="destination-entry" data-destination-index="1">
+                  <div class="destination-entry__top">
+                    <span class="destination-entry__label">Destination 1</span>
+                  </div>
+                  <div class="fields-grid fields-grid--destination">
+                    <label>
+                      Country
+                      <input
+                        type="text"
+                        placeholder="Search country"
+                        data-role="destination-country"
+                        list="country-options"
+                        required
+                      />
+                    </label>
+                    <label>
+                      City (optional)
+                      <input
+                        type="text"
+                        placeholder="Add a city"
+                        data-role="destination-city"
+                        list="city-options"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button type="button" id="add-destination" class="button-secondary">
+                + Add another destination
+              </button>
+              <div class="fields-grid fields-grid--timeline">
+                <label>
+                  Start date
+                  <input type="date" name="period_from" required />
+                </label>
+                <label>
+                  End date
+                  <input type="date" name="period_to" required />
+                </label>
+                <label class="toggle">
+                  <input type="checkbox" name="flexible_dates" />
+                  <span class="toggle__indicator" aria-hidden="true"></span>
+                  <span class="toggle__label">Flexible dates</span>
+                </label>
+                <label>
+                  Preferred transportation
+                  <select name="preferred_transport">
+                    <option value="">No preference</option>
+                    <option value="airplane">Airplane</option>
+                    <option value="train">Train</option>
+                    <option value="bus">Bus</option>
+                    <option value="car">Car</option>
+                    <option value="mix">Mix</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend>Group &amp; companions</legend>
+              <div class="fields-grid fields-grid--compact">
+                <label>
+                  Group type
+                  <select name="group_type" required>
+                    <option value="">Select...</option>
+                    <option value="solo">Solo</option>
+                    <option value="couple">Couple</option>
+                    <option value="group_of_friends">Group of friends</option>
+                    <option value="family">Family</option>
+                  </select>
+                </label>
+                <label>
+                  Adults
+                  <input type="number" name="adults" min="0" value="1" />
+                </label>
+                <label>
+                  Children
+                  <input type="number" name="children" min="0" value="0" />
+                </label>
+                <label>
+                  Seniors
+                  <input type="number" name="seniors" min="0" value="0" />
+                </label>
+                <label class="toggle toggle--inline">
+                  <input type="checkbox" name="pet_accommodation" />
+                  <span class="toggle__indicator" aria-hidden="true"></span>
+                  <span class="toggle__label">Pet accommodation needed</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend>Travel style</legend>
+              <div class="fields-grid fields-grid--compact">
+                <label>
+                  Budget
+                  <select name="budget" required>
+                    <option value="">Select...</option>
+                    <option value="luxury">Luxury</option>
+                    <option value="mid-range">Mid-range</option>
+                    <option value="budget">Budget</option>
+                  </select>
+                </label>
+                <label>
+                  Pace
+                  <select name="pace" required>
+                    <option value="">Select...</option>
+                    <option value="relaxed">Relaxed</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="intensive">Intensive</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend>Optional preferences</legend>
+              <div class="option-groups">
+                <div class="option-group" data-chip-group="accommodation_type">
+                  <span class="option-group__label">Accommodation type</span>
+                  <div class="chip-choices">
+                    <label class="chip-option">
+                      <input type="checkbox" value="hotels" />
+                      <span>Hotels</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="resorts" />
+                      <span>Resorts</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="apartment_airbnb" />
+                      <span>Apartments &amp; Airbnb</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="mix" />
+                      <span>Mix</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="option-group" data-chip-group="top_interests">
+                  <span class="option-group__label">Top interests</span>
+                  <div class="chip-choices">
+                    <label class="chip-option">
+                      <input type="checkbox" value="beaches_water" />
+                      <span>Beaches &amp; Water activities</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="history_sightseeing" />
+                      <span>History &amp; Sightseeing</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="food_culture" />
+                      <span>Food &amp; Culture</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="music_festivals" />
+                      <span>Music &amp; Festivals</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="relaxing_wellness" />
+                      <span>Relaxing &amp; Wellness</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="shopping" />
+                      <span>Shopping</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="nature_wildlife" />
+                      <span>Nature &amp; Wildlife</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="nightlife" />
+                      <span>Nightlife</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="adventure_hikes" />
+                      <span>Adventure &amp; Hikes</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="option-group" data-chip-group="cuisine_preferences">
+                  <span class="option-group__label">Cuisine preferences</span>
+                  <div class="chip-choices">
+                    <label class="chip-option">
+                      <input type="checkbox" value="local" />
+                      <span>Local cuisines</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="international" />
+                      <span>International</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="street_food" />
+                      <span>Street food</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="fine_dining" />
+                      <span>Fine dining</span>
+                    </label>
+                    <label class="chip-option">
+                      <input type="checkbox" value="mix" />
+                      <span>Mix</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+              <legend>Practical constraints</legend>
+              <div class="fields-grid">
+                <label>
+                  Budget per day (USD)
+                  <input
+                    type="number"
+                    name="budget_per_day"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 250"
+                  />
+                </label>
+                <label>
+                  Budget per trip (USD)
+                  <input
+                    type="number"
+                    name="budget_per_trip"
+                    min="0"
+                    step="0.01"
+                    placeholder="Optional"
+                  />
+                </label>
+                <div class="list-input" data-field="health_mobility">
+                  <span class="list-input__label">Health &amp; mobility considerations</span>
+                  <div class="list-input__chips" role="list"></div>
+                  <div class="list-input__controls">
+                    <input
+                      type="text"
+                      placeholder="e.g. no long hikes"
+                      aria-label="Add health or mobility note"
+                    />
+                    <button
+                      type="button"
+                      class="list-input__add"
+                      aria-label="Add consideration"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <label class="toggle toggle--inline">
+                  <input type="checkbox" name="work_travel" />
+                  <span class="toggle__indicator" aria-hidden="true"></span>
+                  <span class="toggle__label">Work travel needs (Wi-Fi, workspace)</span>
+                </label>
+                <label class="full-width">
+                  Other notes
+                  <textarea
+                    name="other"
+                    rows="3"
+                    placeholder="Anything else we should know?"
+                  ></textarea>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" class="submit-btn">Generate trip plan</button>
+              <p class="form-hint">Our travel brain usually replies within moments.</p>
+            </div>
+          </form>
+        </section>
+
+        <aside class="planner__results card card--results" id="results-panel">
+          <header class="card__header card__header--results">
+            <div class="card__header-text">
+              <h2>Your itinerary preview</h2>
+              <p>
+                We will surface the overview, flights, hotels, and a day-by-day
+                schedule the moment your plan is ready.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="icon-button"
+              id="regenerate-plan"
+              title="Regenerate plan"
+              hidden
+            >
+              <span aria-hidden="true">⟳</span>
+              <span class="sr-only">Regenerate plan</span>
+            </button>
+          </header>
+          <div id="status" class="status"></div>
+          <div id="empty-state" class="empty-state">
+            <div class="empty-state__icon">✨</div>
+            <h3>Ready when you are</h3>
+            <p>Complete the form to see a polished itinerary appear.</p>
+          </div>
+          <div id="results" class="results" aria-live="polite"></div>
+        </aside>
+      </div>
+    </main>
+
+    <section class="why" id="why-us">
+      <div class="container why__grid">
+        <div>
+          <h2>Why travelers choose Agentic</h2>
+          <p>
+            We blend the warmth of a human travel advisor with the efficiency of
+            AI agents, stitching everything together into a single shareable
+            plan you can act on immediately.
+          </p>
+        </div>
+        <ul class="why__list">
+          <li>
+            <h3>Always current</h3>
+            <p>Live weather, events, and transport knowledge inform every day.</p>
+          </li>
+          <li>
+            <h3>Full-funnel support</h3>
+            <p>
+              From flights and hotels to dining and emergency contacts—every
+              detail in one place.
+            </p>
+          </li>
+          <li>
+            <h3>Team-friendly</h3>
+            <p>
+              Share plans with travel partners or clients without extra
+              formatting work.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p>&copy; <span id="year"></span> Agentic Trip Planner. All rights reserved.</p>
+        <nav class="footer__nav" aria-label="Footer">
+          <a href="#planner">Planner</a>
+          <a href="#why-us">Why us</a>
+          <a href="mailto:hello@agenticplanner.ai">Support</a>
+        </nav>
+      </div>
+    </footer>
+
+    <template id="day-template">
+      <article class="day-card">
+        <header class="day-card__header">
+          <span class="day-card__number"></span>
+          <div>
+            <h3 class="day-card__title"></h3>
+            <p class="day-card__subtitle"></p>
+          </div>
+        </header>
+        <p class="day-notes"></p>
+        <div class="day-card__grid">
+          <div class="day-section activities">
+            <h4>Morning / Daytime</h4>
+            <ul class="day-activities"></ul>
+          </div>
+          <div class="day-section night">
+            <h4>Evening</h4>
+            <ul class="night-activities"></ul>
+          </div>
+          <div class="day-section dining">
+            <h4>Dining highlights</h4>
+            <ul class="dining-list"></ul>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <template id="destination-template">
+      <div class="destination-entry">
+        <div class="destination-entry__top">
+          <span class="destination-entry__label"></span>
+          <button
+            type="button"
+            class="destination-entry__remove"
+            aria-label="Remove destination"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="fields-grid fields-grid--destination">
+          <label>
+            Country
+            <input
+              type="text"
+              placeholder="Search country"
+              data-role="destination-country"
+              list="country-options"
+              required
+            />
+          </label>
+          <label>
+            City (optional)
+            <input
+              type="text"
+              placeholder="Add a city"
+              data-role="destination-city"
+              list="city-options"
+            />
+          </label>
+        </div>
+      </div>
+    </template>
+
+    <datalist id="country-options"></datalist>
+    <datalist id="city-options"></datalist>
+
+    <script src="/static/script.js" type="module"></script>
+  </body>
+</html>
