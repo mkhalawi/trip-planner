@@ -348,6 +348,14 @@ const CITIES = [
 const MAX_DESTINATIONS = 5;
 const listInputValues = new Map();
 
+const STORAGE_KEYS = {
+  FORM: "agenticPlanner:form",
+  PLAN: "agenticPlanner:plan",
+  PLAN_TIME: "agenticPlanner:planGeneratedAt",
+};
+
+let savedPlanSnapshot = null;
+
 function setCurrentYear() {
   const yearEl = document.getElementById("year");
   if (yearEl) {
@@ -360,6 +368,127 @@ function getNumber(value) {
   return Number.isFinite(parsed) && value !== "" ? parsed : null;
 }
 
+function serializeFormState(form) {
+  if (!form) return null;
+
+  const fieldNames = [
+    "name",
+    "home_country",
+    "home_city",
+    "preferred_languages",
+    "age_group",
+    "period_from",
+    "period_to",
+    "preferred_transport",
+    "group_type",
+    "adults",
+    "children",
+    "seniors",
+    "budget",
+    "pace",
+    "budget_per_day",
+    "budget_per_trip",
+    "other",
+  ];
+
+  const fields = {};
+  fieldNames.forEach((name) => {
+    const element = form.elements.namedItem(name);
+    if (element && "value" in element) {
+      fields[name] = element.value ?? "";
+    }
+  });
+
+  const checkboxes = {};
+  ["flexible_dates", "pet_accommodation", "work_travel"].forEach((name) => {
+    const element = form.elements.namedItem(name);
+    if (element && "checked" in element) {
+      checkboxes[name] = Boolean(element.checked);
+    }
+  });
+
+  const chipGroups = {
+    accommodation_type: getChipSelections("accommodation_type", form),
+    top_interests: getChipSelections("top_interests", form),
+    cuisine_preferences: getChipSelections("cuisine_preferences", form),
+  };
+
+  const { destinations } = collectDestinations(destinationListEl);
+  const listInputsState = {
+    health_mobility: Array.from(
+      (listInputValues.get("health_mobility") || []).filter(Boolean)
+    ),
+  };
+
+  return {
+    fields,
+    checkboxes,
+    chipGroups,
+    destinations,
+    listInputs: listInputsState,
+  };
+}
+
+function storeFormState(state) {
+  if (!state) return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.FORM, JSON.stringify(state));
+  } catch (error) {
+    console.warn("Unable to persist form state", error);
+  }
+}
+
+function saveFormState(form) {
+  const state = serializeFormState(form);
+  if (state) {
+    storeFormState(state);
+  }
+  return state;
+}
+
+function loadStoredFormState() {
+  const raw = localStorage.getItem(STORAGE_KEYS.FORM);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (error) {
+    console.warn("Unable to read stored form state", error);
+    return null;
+  }
+}
+
+function storePlan(plan) {
+  if (!plan) return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.PLAN, JSON.stringify(plan));
+    localStorage.setItem(STORAGE_KEYS.PLAN_TIME, new Date().toISOString());
+  } catch (error) {
+    console.warn("Unable to persist plan", error);
+  }
+}
+
+function loadStoredPlan() {
+  const raw = localStorage.getItem(STORAGE_KEYS.PLAN);
+  if (!raw) return null;
+  try {
+    const plan = JSON.parse(raw);
+    const generatedAt = localStorage.getItem(STORAGE_KEYS.PLAN_TIME);
+    return { plan, generatedAt };
+  } catch (error) {
+    console.warn("Unable to read stored plan", error);
+    return null;
+  }
+}
+
+function formatGeneratedTimestamp(timestamp) {
+  if (!timestamp) return null;
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 function getSelectedValues(select) {
   return Array.from(select.selectedOptions).map((option) => option.value);
 }
@@ -421,6 +550,7 @@ let emptyStateDefaults = null;
 let destinationListEl = null;
 let addDestinationBtn = null;
 let destinationTemplate = null;
+let regenerateButton = null;
 
 function populateDatalist(id, values) {
   const datalist = document.getElementById(id);
@@ -580,6 +710,62 @@ function collectDestinations(listElement) {
   return { destinations, hasEmptyCountry };
 }
 
+function applyFormState(form, state) {
+  if (!form || !state) return;
+
+  const { fields = {}, checkboxes = {}, chipGroups = {}, destinations = [], listInputs = {} } =
+    state;
+
+  Object.entries(fields).forEach(([name, value]) => {
+    const element = form.elements.namedItem(name);
+    if (element && "value" in element) {
+      element.value = value ?? "";
+    }
+  });
+
+  Object.entries(checkboxes).forEach(([name, checked]) => {
+    const element = form.elements.namedItem(name);
+    if (element && "checked" in element) {
+      element.checked = Boolean(checked);
+    }
+  });
+
+  Object.entries(chipGroups).forEach(([groupName, values]) => {
+    const groupEl = form.querySelector(`[data-chip-group="${groupName}"]`);
+    if (!groupEl) return;
+    const selected = new Set(Array.isArray(values) ? values : []);
+    groupEl.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      input.checked = selected.has(input.value);
+    });
+  });
+
+  Object.entries(listInputs).forEach(([field, values]) => {
+    if (Array.isArray(values)) {
+      listInputValues.set(field, [...values]);
+    }
+  });
+
+  if (Array.isArray(destinations) && destinations.length && destinationListEl) {
+    const currentCount = destinationListEl.querySelectorAll(".destination-entry").length;
+    for (let i = currentCount; i < destinations.length; i += 1) {
+      addDestination(destinationListEl, destinationTemplate, addDestinationBtn);
+    }
+    const entries = destinationListEl.querySelectorAll(".destination-entry");
+    destinations.forEach((destination, index) => {
+      const entry = entries[index];
+      if (!entry) return;
+      const countryInput = entry.querySelector('[data-role="destination-country"]');
+      const cityInput = entry.querySelector('[data-role="destination-city"]');
+      if (countryInput) {
+        countryInput.value = destination?.country || "";
+      }
+      if (cityInput) {
+        cityInput.value = destination?.city || "";
+      }
+    });
+  }
+}
+
 function toggleEmptyState(show) {
   if (!emptyState) return;
   emptyState.classList.toggle("hidden", !show);
@@ -606,12 +792,20 @@ function resetEmptyStateMessage() {
   );
 }
 
+function showRegenerateButton(visible) {
+  if (!regenerateButton) return;
+  regenerateButton.hidden = !visible;
+}
+
 function renderPlan(plan) {
   if (!resultsContainer) return;
 
   resultsContainer.innerHTML = "";
   toggleEmptyState(false);
   resetEmptyStateMessage();
+
+  savedPlanSnapshot = plan;
+  showRegenerateButton(true);
 
   const overview = document.createElement("div");
   overview.className = "result-card overview-card";
@@ -867,6 +1061,18 @@ function attachFormHandler() {
   destinationListEl = document.getElementById("destination-list");
   addDestinationBtn = document.getElementById("add-destination");
   destinationTemplate = document.getElementById("destination-template");
+  regenerateButton = document.getElementById("regenerate-plan");
+
+  if (regenerateButton) {
+    regenerateButton.addEventListener("click", () => {
+      form.requestSubmit();
+    });
+  }
+
+  const storedFormState = loadStoredFormState();
+  if (storedFormState) {
+    applyFormState(form, storedFormState);
+  }
 
   if (destinationListEl) {
     updateDestinationLabels(destinationListEl);
@@ -883,6 +1089,49 @@ function attachFormHandler() {
 
   form.querySelectorAll(".list-input").forEach((element) => initListInput(element));
 
+  const storedPlan = loadStoredPlan();
+  if (storedPlan?.plan) {
+    renderPlan(storedPlan.plan);
+    const timestamp = formatGeneratedTimestamp(storedPlan.generatedAt);
+    statusEl.textContent = timestamp
+      ? `Plan generated ${timestamp}`
+      : "Showing your latest itinerary.";
+    statusEl.className = "status success";
+  } else {
+    showRegenerateButton(false);
+    statusEl.textContent = "";
+    statusEl.className = "status";
+    resetEmptyStateMessage();
+    toggleEmptyState(true);
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const hadPlanBeforeSubmit = Boolean(savedPlanSnapshot);
+
+    statusEl.textContent = "Planning your trip...";
+    statusEl.className = "status loading";
+
+    if (!hadPlanBeforeSubmit) {
+      setEmptyStateMessage(
+        "Crafting your itinerary",
+        "Our travel brains are comparing flights, stays, and experiences tailored to you.",
+        "🧳"
+      );
+      toggleEmptyState(true);
+      if (resultsContainer) {
+        resultsContainer.innerHTML = "";
+      }
+    } else if (resultsContainer) {
+      resultsContainer.classList.add("results--busy");
+    }
+
+    showRegenerateButton(false);
+
+    let payload;
+    try {
+      payload = buildPayload(form);
+      saveFormState(form);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     statusEl.textContent = "Planning your trip...";
@@ -905,6 +1154,16 @@ function attachFormHandler() {
       console.error(error);
       statusEl.textContent = error.message || "Please review the form and try again.";
       statusEl.className = "status error";
+      if (!hadPlanBeforeSubmit) {
+        resetEmptyStateMessage();
+        toggleEmptyState(false);
+      } else if (resultsContainer) {
+        resultsContainer.classList.remove("results--busy");
+        showRegenerateButton(Boolean(savedPlanSnapshot));
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
       resetEmptyStateMessage();
       toggleEmptyState(false);
       if (submitBtn) submitBtn.disabled = false;
@@ -932,6 +1191,17 @@ function attachFormHandler() {
               : JSON.stringify(errorBody.details);
         }
         throw err;
+      }
+
+      const plan = await response.json();
+      storePlan(plan);
+      statusEl.textContent = "Trip plan generated! Refreshing…";
+      statusEl.className = "status success";
+      setTimeout(() => window.location.reload(), 800);
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = error.message || "Unexpected error occurred.";
+      statusEl.className = "status error";
         const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Unable to generate plan.");
       }
@@ -948,6 +1218,22 @@ function attachFormHandler() {
         typeof error.details === "string" && error.details.trim().length
           ? error.details.trim()
           : null;
+      if (!hadPlanBeforeSubmit) {
+        setEmptyStateMessage(
+          "We hit a snag",
+          details ||
+            "Please tweak a detail and try again. If the issue persists, refresh the page and submit once more.",
+          "⚠️"
+        );
+        toggleEmptyState(true);
+      } else if (details) {
+        statusEl.textContent = `${statusEl.textContent} ${details}`;
+      }
+      showRegenerateButton(Boolean(savedPlanSnapshot));
+    } finally {
+      if (resultsContainer) {
+        resultsContainer.classList.remove("results--busy");
+      }
       setEmptyStateMessage(
         "We hit a snag",
         details ||
